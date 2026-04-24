@@ -2,6 +2,10 @@
   "name": "jav-pack-api",
   "type": "module",
   "scripts": {
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
@@ -10,6 +14,8 @@
     "hono": "^4.12.15"
   },
   "devDependencies": {
+    "oxfmt": "^0.46.0",
+    "oxlint": "^1.61.0",
     "wrangler": "^4.85.0"
   }
 }
