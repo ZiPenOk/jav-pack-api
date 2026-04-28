@@ -1,32 +1,13 @@
 import { Hono } from "hono";
-import { ContentfulStatusCode } from "hono/utils/http-status";
+
+import { getMovie } from "./services/avwiki";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.get("/", (c) => c.text("Hello, World!"));
 
 app.get("/trailers/:code", async (c) => {
-  const res = await fetch(`https://avwikidb.com/work/${encodeURIComponent(c.req.param("code"))}/`, {
-    headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36" },
-  });
-
-  if (!res.ok) return c.json({ error: res.statusText }, res.status as ContentfulStatusCode);
-
-  let jsonText = "";
-
-  await new HTMLRewriter()
-    .on("script#__NEXT_DATA__", {
-      text: (chunk) => {
-        jsonText += chunk.text;
-      },
-    })
-    .transform(res)
-    .arrayBuffer();
-
-  if (!jsonText) c.json({ error: "__NEXT_DATA__ script tag not found" }, 404);
-
-  const movie = JSON.parse(jsonText)?.props?.pageProps?.movie;
-
+  const movie = await getMovie(c.req.param("code"));
   return movie ? c.json({ cid: movie.fanzaContentId, trailer: movie.sampleVideoBestUrl }) : c.notFound();
 });
 
