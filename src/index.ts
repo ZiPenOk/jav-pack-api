@@ -31,7 +31,9 @@ app.get("/trailers/:code", async (c) => {
     .arrayBuffer();
 
   return jsonText
-    ? c.json({ data: JSON.parse(jsonText) })
+    ? c.json({
+        trailer: JSON.parse(jsonText)?.data?.props?.pageProps?.movie?.sampleVideoBestUrl,
+      })
     : c.json({ error: "__NEXT_DATA__ script tag not found" }, 404);
 });
 
