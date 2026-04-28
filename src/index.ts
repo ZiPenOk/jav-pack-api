@@ -32,7 +32,7 @@ app.get("/trailers/:code", async (c) => {
 
   return jsonText
     ? c.json({
-        trailer: JSON.parse(jsonText)?.data?.props?.pageProps?.movie?.sampleVideoBestUrl,
+        trailer: JSON.parse(jsonText)?.props?.pageProps?.movie?.sampleVideoBestUrl,
       })
     : c.json({ error: "__NEXT_DATA__ script tag not found" }, 404);
 });
