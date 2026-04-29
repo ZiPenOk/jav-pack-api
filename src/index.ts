@@ -1,14 +1,20 @@
 import { Hono } from "hono";
 
-import { getMovie } from "./services/avwiki";
+import AVWikiDB from "./services/AVWikiDB";
+import JAVDatabase from "./services/JAVDatabase";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.get("/", (c) => c.text("Hello, World!"));
 
 app.get("/trailers/:code", async (c) => {
-  const movie = await getMovie(c.req.param("code"));
-  return movie ? c.json({ cid: movie.fanzaContentId, trailer: movie.sampleVideoBestUrl }) : c.notFound();
+  const code = c.req.param("code");
+
+  try {
+    return c.json(await Promise.any([AVWikiDB.getTrailer(code), JAVDatabase.getTrailer(code)]));
+  } catch {
+    return c.notFound();
+  }
 });
 
 app.notFound((c) => c.json({ error: "Not Found" }, 404));
