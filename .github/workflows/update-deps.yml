@@ -1,0 +1,36 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpx taze -w
+
+      - run: pnpm i --no-frozen-lockfile
+
+      - run: pnpm cf-typegen
+
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(deps): update"
+          title: "chore(deps): update"
+          branch: chore/deps-update
+          delete-branch: true
